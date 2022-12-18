@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pomodoro Clock</title>
+  <style>
+    /* Add your CSS here */
+    #clock {
+      width: 300px;
+      height: 300px;
+      border: 10px solid #333;
+      border-radius: 50%;
+      margin: 20px auto;
+      position: relative;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #clock p {
+      text-align: center;
+      font-size: 60px;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #clock .arm {
+    width: 30%;
+    height: 5px;
+    background-color: #333;
+    position: absolute;
+    top: 52%;
+    left: 25%;
+    transform-origin: center bottom;
+    transform: translate(-50%, -50%) rotate(180deg);
+    transition: transform 0.1s linear;
+    }
+    #controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #controls button {
+      font-size: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    #controls button:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Add your HTML here -->
+  <div id="clock">
+    <div class="arm"></div>
+    <p>25:00</p>
+  </div>
+  <div id="controls">
+    <button id="start">Start</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button>
+  </div>
+  <audio id="alarm" src="alarm/alarm.mp3"></audio>
+  <script>
+    // Add your JavaScript here
+    const clock = document.getElementById('clock');
+    const startButton = document.getElementById('start');
+    const pauseButton = document.getElementById('pause');
+    const resetButton = document.getElementById('reset');
+    const alarm = document.getElementById('alarm');
+    const arm = clock.querySelector('.arm');
+    let interval;
+    let time = 1500; // duration in seconds
+
+    function displayTime() {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      clock.querySelector('p').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      const degrees = (time / 60) * 360;
+      arm.style.transform = `rotate(${degrees}deg) translate(-50%, -50%)`;
+    }
+
+    function countdown() {
+        interval = setInterval(() => {
+        time--;
+        if (time < 0) {
+          clearInterval(interval);
+          alarm.play();
+          time = 300; // set break duration to 5 minutes
+          countdown(); // start break
+        }
+        displayTime();
+      }, 1000);
+    }
+
+    function pause() {
+      clearInterval(interval);
+      alarm.pause();
+      alarm.currentTime = 0;
+    }
+
+    function reset() {
+      clearInterval(interval);
+      alarm.pause();
+      alarm.currentTime = 0;
+      time = 1500; // reset to 25 minutes
+      displayTime();
+    }
+
+    startButton.addEventListener('click', () => {
+      pause();
+      countdown();
+    });
+    pauseButton.addEventListener('click', pause);
+    resetButton.addEventListener('click', reset);
+
+    displayTime();
+  </script>
+</body>
+</html>
